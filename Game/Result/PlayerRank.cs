@@ -11,8 +11,6 @@ namespace PaintBot.Game.Result
         public bool Alive { get; set; }
 
         public override string ToString()
-        {
-            return $"{PlayerName} ({PlayerId} - Rank: {Rank} - Points: {Points} - Alive? {(Alive ? "Yes" : "No")}";
-        }
+         => $"{PlayerName} ({PlayerId} - Rank: {Rank} - Points: {Points} - Alive? {(Alive ? "Yes" : "No")}";
     }
 }

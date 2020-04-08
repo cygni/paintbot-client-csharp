@@ -5,28 +5,20 @@
 
     public class MapCoordinate
     {
-        public MapCoordinate(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-
         public int X { get; }
 
         public int Y { get; }
 
+        public MapCoordinate(int x, int y) => (X, Y) = (x, y);
 
-        public MapCoordinate MoveIn(Action action)
+        public MapCoordinate MoveIn(Action action) => action switch
         {
-            return action switch
-            {
-                Action.Down => Move(0, 1),
-                Action.Up => Move(0, -1),
-                Action.Left => Move(-1, 0),
-                Action.Right => Move(1, 0),
-                _ => Move(0, 0)
-            };
-        }
+            Action.Down => Move(0, 1),
+            Action.Up => Move(0, -1),
+            Action.Left => Move(-1, 0),
+            Action.Right => Move(1, 0),
+            _ => Move(0, 0)
+        };
 
         public int GetManhattanDistanceTo(MapCoordinate coordinate)
         {
@@ -48,7 +40,7 @@
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((MapCoordinate) obj);
+            return Equals((MapCoordinate)obj);
         }
 
         public override int GetHashCode()

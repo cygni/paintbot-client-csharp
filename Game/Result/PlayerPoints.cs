@@ -7,8 +7,6 @@
         public int Points { get; set; }
 
         public override string ToString()
-        {
-            return $"{Name} (${PlayerId}) - {Points} points";
-        }
+         => $"{Name} (${PlayerId}) - {Points} points";
     }
 }

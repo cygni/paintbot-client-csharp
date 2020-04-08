@@ -67,7 +67,7 @@ namespace PaintBot.Messaging
             }
             catch (Exception ex)
             {
-                Console.WriteLine("FAN");
+                Console.WriteLine(ex.Message);
             }
 
             await Task.CompletedTask;

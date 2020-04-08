@@ -45,70 +45,34 @@
             }
         }
 
-        private async Task HandleResponseAsync(Response response, CancellationToken ct)
+        private Task HandleResponseAsync(Response response, CancellationToken ct) => response switch
         {
-            switch (response)
-            {
-                case PlayerRegistered playerRegistered:
-                    await OnPlayerRegistered(playerRegistered, ct);
-                    break;
+            PlayerRegistered playerRegistered => OnPlayerRegistered(playerRegistered, ct),
+            MapUpdated mapUpdated => OnMapUpdated(mapUpdated, ct),
+            GameLink gameLink => OnInfoEvent(gameLink),
+            GameStarting gameStarting => OnInfoEvent(gameStarting),
+            GameResult gameResult => OnInfoEvent(gameResult),
+            CharacterStunned characterStunned => OnInfoEvent(characterStunned),
+            HeartBeatResponse heartBeatResponse => OnHearBeatEvent(heartBeatResponse),
+            GameEnded gameEnded => OnGameEnded(gameEnded),
+            TournamentEnded tournamentEnded => OnTournamentEnded(tournamentEnded),
+            InvalidPlayerName invalidPlayerName => OnInfoEvent(invalidPlayerName),
+            _ => Task.CompletedTask
+        };
 
-                case MapUpdated mapUpdated:
-                    await OnMapUpdated(mapUpdated, ct);
-                    break;
-
-                case GameLink gameLink:
-                    OnInfoEvent(gameLink);
-                    break;
-
-                case GameStarting gameStarting:
-                    OnInfoEvent(gameStarting);
-                    break;
-
-                case GameResult gameResult:
-                    OnInfoEvent(gameResult);
-                    break;
-
-                case CharacterStunned characterStunned:
-                    OnInfoEvent(characterStunned);
-                    break;
-
-                case HeartBeatResponse heartBeatResponse:
-                    OnHearBeatEvent(heartBeatResponse);
-                    break;
-
-                case GameEnded gameEnded:
-                    OnGameEnded(gameEnded);
-                    break;
-
-                case TournamentEnded tournamentEnded:
-                    OnTournamentEnded(tournamentEnded);
-                    break;
-
-                case InvalidPlayerName invalidPlayerName:
-                    OnInfoEvent(invalidPlayerName);
-                    throw new Exception("Player name was invalid. Shutting down...");
-
-                default:
-                    Console.WriteLine($"Unhandled response of type {response?.Type}");
-                    break;
-            }
-        }
-
-        private void OnTournamentEnded(TournamentEnded tournamentEnded)
+        private Task OnTournamentEnded(TournamentEnded tournamentEnded)
         {
             _hasTournamentEnded = true;
             Console.WriteLine(tournamentEnded);
+            return Task.CompletedTask;
         }
 
         private async Task OnPlayerRegistered(PlayerRegistered playerRegistered, CancellationToken ct)
         {
             _playerId = playerRegistered.ReceivingPlayerId;
             SendHearBeat();
-            await _client.SendAsync(new StartGame(playerRegistered.ReceivingPlayerId),
-                ct); // TODO: Create a factory for requests?
-            await _client.SendAsync(
-                new ClientInfo("C#", "8", "Windows", "10", "1", playerRegistered.ReceivingPlayerId), ct);
+            await _client.SendAsync(new StartGame(playerRegistered.ReceivingPlayerId), ct);
+            await _client.SendAsync(new ClientInfo("C#", "8", "Windows", "10", "1", playerRegistered.ReceivingPlayerId), ct);
             Console.WriteLine(playerRegistered);
         }
 
@@ -124,21 +88,24 @@
                 }, ct);
         }
 
-        private void OnInfoEvent(Response response)
+        private Task OnInfoEvent(Response response)
         {
             Console.WriteLine(response);
+            return Task.CompletedTask;
         }
 
-        private void OnHearBeatEvent(HeartBeatResponse heartBeat)
+        private Task OnHearBeatEvent(HeartBeatResponse heartBeat)
         {
             Console.WriteLine(heartBeat);
             SendHearBeat();
+            return Task.CompletedTask;
         }
 
-        private void OnGameEnded(GameEnded response)
+        private Task OnGameEnded(GameEnded response)
         {
             _hasGameEnded = true;
             Console.WriteLine(response);
+            return Task.CompletedTask;
         }
 
         private bool IsPlaying()
