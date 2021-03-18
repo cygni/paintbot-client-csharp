@@ -8,6 +8,7 @@
     using Messaging.Request;
     using Messaging.Response;
     using Action = Game.Action.Action;
+    using static Serilog.Log;
 
     public abstract class Paintbot
     {
@@ -37,7 +38,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message); // TODO: Add proper logging
+                Logger.Error(ex, ex.Message); // TODO: Add proper logging
             }
             finally
             {
@@ -63,7 +64,7 @@
         private Task OnTournamentEnded(TournamentEnded tournamentEnded)
         {
             _hasTournamentEnded = true;
-            Console.WriteLine(tournamentEnded);
+            Logger.Information(tournamentEnded.ToString());
             return Task.CompletedTask;
         }
 
@@ -73,7 +74,7 @@
             SendHearBeat();
             await _client.SendAsync(new StartGame(playerRegistered.ReceivingPlayerId), ct);
             await _client.SendAsync(new ClientInfo("C#", "8", "Windows", "10", "1", playerRegistered.ReceivingPlayerId), ct);
-            Console.WriteLine(playerRegistered);
+            Logger.Information(playerRegistered.ToString());
         }
 
         private async Task OnMapUpdated(MapUpdated mapUpdated, CancellationToken ct)
@@ -90,13 +91,13 @@
 
         private Task OnInfoEvent(Response response)
         {
-            Console.WriteLine(response);
+            Logger.Information(response.ToString());
             return Task.CompletedTask;
         }
 
         private Task OnHearBeatEvent(HeartBeatResponse heartBeat)
         {
-            Console.WriteLine(heartBeat);
+            Logger.Information(heartBeat.ToString());
             SendHearBeat();
             return Task.CompletedTask;
         }
@@ -104,7 +105,7 @@
         private Task OnGameEnded(GameEnded response)
         {
             _hasGameEnded = true;
-            Console.WriteLine(response);
+            Logger.Information(response.ToString());
             return Task.CompletedTask;
         }
 

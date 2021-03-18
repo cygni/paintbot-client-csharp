@@ -2,7 +2,7 @@
 
 ### TODO
 
-- [ ] Propper logging with a logger and not Console.WriteLine
+- [X] Propper logging with a logger and not Console.WriteLine
 - [ ] Better log messages
 - [ ] Tests
 - [ ] Console output on map update? Right now just empty

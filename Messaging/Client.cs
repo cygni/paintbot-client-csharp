@@ -9,6 +9,7 @@ namespace PaintBot.Messaging
     using System.Threading;
     using System.Threading.Tasks;
     using Response;
+    using static Serilog.Log;
 
     public class Client
     {
@@ -67,7 +68,7 @@ namespace PaintBot.Messaging
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.Error(ex, ex.Message);
             }
 
             await Task.CompletedTask;

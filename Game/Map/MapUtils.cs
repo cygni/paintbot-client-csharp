@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Action = Action.Action;
+    using static Serilog.Log;
 
     public class MapUtils : IMapUtils
     {
@@ -56,7 +57,7 @@
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Logger.Error(e, e.Message);
                 return false;
             }
         }
