@@ -27,7 +27,7 @@
         /// <summary>
         /// Returns the coordinate of the given player
         /// </summary>
-        MapCoordinate GetPositionOf(string playerId);
+        MapCoordinate GetCoordinateOf(string playerId);
 
         /// <summary>
         /// Returns info about the given player's character

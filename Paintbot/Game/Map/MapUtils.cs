@@ -77,7 +77,7 @@
             return GetCoordinatesFrom(_obstaclePositions);
         }
 
-        public MapCoordinate GetPositionOf(string playerId)
+        public MapCoordinate GetCoordinateOf(string playerId)
         {
             return GetCoordinateFrom(GetCharacterInfoFor(playerId).Position);
         }
@@ -93,8 +93,8 @@
 
         public MapCoordinate GetCoordinateFrom(int position)
         {
-            var y = position / _width;
-            var x = position - y * _width;
+            var x = position % _width;
+            var y = (position - x) / _width;
             return new MapCoordinate(x, y);
         }
 
@@ -107,9 +107,6 @@
         {
             if (coordinate == null)
                 throw new ArgumentNullException(nameof(coordinate));
-
-            if (IsCoordinateOutOfBounds(coordinate))
-                throw new Exception($"Coordinate ({coordinate.X}, {coordinate.Y} is out of bounds)");
 
             return coordinate.X + coordinate.Y * _width;
         }
