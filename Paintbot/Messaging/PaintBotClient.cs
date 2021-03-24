@@ -8,32 +8,33 @@ namespace PaintBot.Messaging
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
+    using Game.Configuration;
     using Response;
     using static Serilog.Log;
 
-    public class PaintBotClient
+    public class PaintBotClient : IPaintBotClient
     {
         private readonly ClientWebSocket _clientWebSocket;
-        private readonly JsonSerializerOptions _serializeOptions;
-
-        private PaintBotClient(ClientWebSocket clientWebSocket)
+        private readonly PaintBotServerConfig _config;
+        private readonly JsonSerializerOptions _serializeOptions = new()
         {
-            _clientWebSocket = clientWebSocket;
-            _serializeOptions = new JsonSerializerOptions
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters =
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Converters =
-                {
-                    new ResponseConverter()
-                } // TODO: Should we move this out of the client to make the it less aware of the messages?
-            };
+                new ResponseConverter()
+            } // TODO: Should we move this out of the client to make the it less aware of the messages?
+        };
+
+        public PaintBotClient(PaintBotServerConfig config)
+        {
+            _config = config;
+            _clientWebSocket = new ClientWebSocket();
         }
 
-        public static async Task<PaintBotClient> ConnectAsync(Uri uri, CancellationToken ct)
+        public async Task ConnectAsync(GameMode gameMode, CancellationToken ct)
         {
-            var clientWebSocket = new ClientWebSocket();
-            await clientWebSocket.ConnectAsync(uri, ct);
-            return new PaintBotClient(clientWebSocket);
+            var uri = new Uri($"{_config.BaseUrl}/{gameMode.ToString().ToLower()}");
+            await _clientWebSocket.ConnectAsync(uri, ct);
         }
 
         public async Task SendAsync<T>(T message, CancellationToken ct)

@@ -1,4 +1,4 @@
-﻿namespace PaintBot.Messaging.Request
+﻿namespace PaintBot.Messaging.Request.HeartBeat
 {
     public class HeartBeatRequest : Request
     {

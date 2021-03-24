@@ -6,16 +6,25 @@
     using Game.Configuration;
     using Messaging;
     using Messaging.Request;
+    using Messaging.Request.HeartBeat;
     using Messaging.Response;
-    using Action = Game.Action.Action;
     using static Serilog.Log;
+    using Action = Game.Action.Action;
 
-    public abstract class Paintbot
+    public abstract class PaintBot
     {
-        private PaintBotClient _paintBotClient;
+        private readonly IPaintBotClient _paintBotClient;
+        private readonly IHearBeatSender _heartBeatSender;
+
         private bool _hasGameEnded;
         private bool _hasTournamentEnded;
         private string _playerId;
+
+        protected PaintBot(IPaintBotClient paintBotClient, IHearBeatSender heartBeatSender)
+        {
+            _paintBotClient = paintBotClient;
+            _heartBeatSender = heartBeatSender;
+        }
 
         public abstract GameMode GameMode { get; }
         public abstract string Name { get; }
@@ -25,16 +34,18 @@
         {
             try
             {
-                var url = $"wss://server.paintbot.cygni.se/{GameMode.ToString().ToLower()}";
-                _paintBotClient = await PaintBotClient.ConnectAsync(new Uri(url), ct);
+                await _paintBotClient.ConnectAsync(GameMode, ct);
 
-                var gameSettings = new GameSettings {GameDurationInSeconds = 20};
+                var gameSettings = new GameSettings {GameDurationInSeconds = 20}; // TODO: Remove
                 await _paintBotClient.SendAsync(new RegisterPlayer(Name, gameSettings), ct);
 
                 await foreach (var response in _paintBotClient.ReceiveEnumerableAsync<Response>(ct))
                 {
                     await HandleResponseAsync(response, ct);
-                    if (!IsPlaying()) break;
+                    if (!IsPlaying())
+                    {
+                        break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -47,20 +58,23 @@
             }
         }
 
-        private Task HandleResponseAsync(Response response, CancellationToken ct) => response switch
+        private Task HandleResponseAsync(Response response, CancellationToken ct)
         {
-            PlayerRegistered playerRegistered => OnPlayerRegistered(playerRegistered, ct),
-            MapUpdated mapUpdated => OnMapUpdated(mapUpdated, ct),
-            GameLink gameLink => OnInfoEvent(gameLink),
-            GameStarting gameStarting => OnInfoEvent(gameStarting),
-            GameResult gameResult => OnInfoEvent(gameResult),
-            CharacterStunned characterStunned => OnInfoEvent(characterStunned),
-            HeartBeatResponse heartBeatResponse => OnHearBeatEvent(heartBeatResponse),
-            GameEnded gameEnded => OnGameEnded(gameEnded),
-            TournamentEnded tournamentEnded => OnTournamentEnded(tournamentEnded),
-            InvalidPlayerName invalidPlayerName => OnInfoEvent(invalidPlayerName),
-            _ => Task.CompletedTask
-        };
+            return response switch
+            {
+                PlayerRegistered playerRegistered => OnPlayerRegistered(playerRegistered, ct),
+                MapUpdated mapUpdated => OnMapUpdated(mapUpdated, ct),
+                GameLink gameLink => OnInfoEvent(gameLink),
+                GameStarting gameStarting => OnInfoEvent(gameStarting),
+                GameResult gameResult => OnInfoEvent(gameResult),
+                CharacterStunned characterStunned => OnInfoEvent(characterStunned),
+                HeartBeatResponse heartBeatResponse => OnHearBeatEvent(heartBeatResponse),
+                GameEnded gameEnded => OnGameEnded(gameEnded),
+                TournamentEnded tournamentEnded => OnTournamentEnded(tournamentEnded),
+                InvalidPlayerName invalidPlayerName => OnInfoEvent(invalidPlayerName),
+                _ => Task.CompletedTask
+            };
+        }
 
         private Task OnTournamentEnded(TournamentEnded tournamentEnded)
         {
@@ -100,6 +114,7 @@
                     Logger.Information($"The On info event {response}");
                 }
             }
+
             return Task.CompletedTask;
         }
 
@@ -121,19 +136,23 @@
             {
                 Logger.Information("The game has ended"); // Don't spoil the result in the console.
             }
+
             return Task.CompletedTask;
         }
 
         private bool IsPlaying()
         {
             if (GameMode == GameMode.Training)
+            {
                 return !_hasGameEnded;
+            }
+
             return !_hasTournamentEnded;
         }
 
         private void SendHearBeat()
         {
-            new HeartBeatSender(_playerId, _paintBotClient).Run();
+            _heartBeatSender.SendHeartBeatFrom(_playerId);
         }
     }
 }
