@@ -2,9 +2,9 @@
 {
     public enum Tile
     {
-        EMPTY,
-        OBSTACLE,
-        POWERUP,
-        CHARACTER
+        Empty,
+        Obstacle,
+        PowerUp,
+        Character
     }
 }

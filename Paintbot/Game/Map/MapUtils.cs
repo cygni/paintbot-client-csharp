@@ -125,15 +125,15 @@
                 throw new Exception($"Position {position} is out of bounds");
 
             if (_powerups.Get(position))
-                return Tile.POWERUP;
+                return Tile.PowerUp;
 
             if (_obstacles.Get(position))
-                return Tile.OBSTACLE;
+                return Tile.Obstacle;
 
             if (_characters.Get(position))
-                return Tile.CHARACTER;
+                return Tile.Character;
 
-            return Tile.EMPTY;
+            return Tile.Empty;
         }
 
         public bool IsMovementPossibleTo(MapCoordinate coordinate)

@@ -22,6 +22,11 @@
 
         public int GetManhattanDistanceTo(MapCoordinate coordinate)
         {
+            if (coordinate == null)
+            {
+                throw new ArgumentNullException(nameof(coordinate));
+            }
+
             return Math.Abs(X - coordinate.X) + Math.Abs(Y - coordinate.Y);
         }
 

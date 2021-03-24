@@ -11,12 +11,12 @@ namespace PaintBot.Messaging
     using Response;
     using static Serilog.Log;
 
-    public class Client
+    public class PaintBotClient
     {
         private readonly ClientWebSocket _clientWebSocket;
         private readonly JsonSerializerOptions _serializeOptions;
 
-        private Client(ClientWebSocket clientWebSocket)
+        private PaintBotClient(ClientWebSocket clientWebSocket)
         {
             _clientWebSocket = clientWebSocket;
             _serializeOptions = new JsonSerializerOptions
@@ -26,15 +26,14 @@ namespace PaintBot.Messaging
                 {
                     new ResponseConverter()
                 } // TODO: Should we move this out of the client to make the it less aware of the messages?
-                // Converters = { new ResponseConverter2(new Dictionary<string, Type> { { MessageType.GameLink, typeof(GameLink) } }) } 
             };
         }
 
-        public static async Task<Client> ConnectAsync(Uri uri, CancellationToken ct)
+        public static async Task<PaintBotClient> ConnectAsync(Uri uri, CancellationToken ct)
         {
             var clientWebSocket = new ClientWebSocket();
             await clientWebSocket.ConnectAsync(uri, ct);
-            return new Client(clientWebSocket);
+            return new PaintBotClient(clientWebSocket);
         }
 
         public async Task SendAsync<T>(T message, CancellationToken ct)

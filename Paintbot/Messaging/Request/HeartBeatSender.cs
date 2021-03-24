@@ -5,13 +5,13 @@
     public class HeartBeatSender
     {
         private const int DefaultHeartbeatPeriodInSeconds = 30;
-        private readonly Client _client;
+        private readonly PaintBotClient _paintBotClient;
         private readonly string _playerId;
 
-        public HeartBeatSender(string playerId, Client client)
+        public HeartBeatSender(string playerId, PaintBotClient paintBotClient)
         {
             _playerId = playerId;
-            _client = client;
+            _paintBotClient = paintBotClient;
         }
 
         public void Run()
@@ -21,7 +21,7 @@
                 Thread.CurrentThread.IsBackground = true;
                 Thread.Sleep(DefaultHeartbeatPeriodInSeconds * 1000);
                 var heartBeatRequest = new HeartBeatRequest(_playerId);
-                await _client.SendAsync(heartBeatRequest, CancellationToken.None);
+                await _paintBotClient.SendAsync(heartBeatRequest, CancellationToken.None);
             }).Start();
         }
     }

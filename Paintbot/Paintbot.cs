@@ -12,7 +12,7 @@
 
     public abstract class Paintbot
     {
-        private Client _client;
+        private PaintBotClient _paintBotClient;
         private bool _hasGameEnded;
         private bool _hasTournamentEnded;
         private string _playerId;
@@ -26,11 +26,12 @@
             try
             {
                 var url = $"wss://server.paintbot.cygni.se/{GameMode.ToString().ToLower()}";
-                _client = await Client.ConnectAsync(new Uri(url), ct);
+                _paintBotClient = await PaintBotClient.ConnectAsync(new Uri(url), ct);
 
-                await _client.SendAsync(new RegisterPlayer(Name, new GameSettings()), ct);
+                var gameSettings = new GameSettings {GameDurationInSeconds = 20};
+                await _paintBotClient.SendAsync(new RegisterPlayer(Name, gameSettings), ct);
 
-                await foreach (var response in _client.ReceiveEnumerableAsync<Response>(ct))
+                await foreach (var response in _paintBotClient.ReceiveEnumerableAsync<Response>(ct))
                 {
                     await HandleResponseAsync(response, ct);
                     if (!IsPlaying()) break;
@@ -42,7 +43,7 @@
             }
             finally
             {
-                _client?.Close();
+                _paintBotClient?.Close();
             }
         }
 
@@ -64,7 +65,7 @@
         private Task OnTournamentEnded(TournamentEnded tournamentEnded)
         {
             _hasTournamentEnded = true;
-            Logger.Information(tournamentEnded.ToString());
+            Logger.Information("The tournament has ended"); // Don't spoil the results in the console. 
             return Task.CompletedTask;
         }
 
@@ -72,15 +73,16 @@
         {
             _playerId = playerRegistered.ReceivingPlayerId;
             SendHearBeat();
-            await _client.SendAsync(new StartGame(playerRegistered.ReceivingPlayerId), ct);
-            await _client.SendAsync(new ClientInfo("C#", "8", "Windows", "10", "1", playerRegistered.ReceivingPlayerId), ct);
+            await _paintBotClient.SendAsync(new StartGame(playerRegistered.ReceivingPlayerId), ct);
+            await _paintBotClient.SendAsync(new ClientInfo("C#", "8", "Windows", "10", "1", playerRegistered.ReceivingPlayerId), ct);
             Logger.Information(playerRegistered.ToString());
         }
 
         private async Task OnMapUpdated(MapUpdated mapUpdated, CancellationToken ct)
         {
+            Logger.Information($"Tick {mapUpdated.GameTick}");
             var action = GetAction(mapUpdated);
-            await _client.SendAsync(
+            await _paintBotClient.SendAsync(
                 new RegisterMove(mapUpdated.ReceivingPlayerId)
                 {
                     GameId = mapUpdated.GameId,
@@ -91,7 +93,13 @@
 
         private Task OnInfoEvent(Response response)
         {
-            Logger.Information(response.ToString());
+            if (response is GameResult)
+            {
+                if (GameMode == GameMode.Training)
+                {
+                    Logger.Information($"The On info event {response}");
+                }
+            }
             return Task.CompletedTask;
         }
 
@@ -105,7 +113,14 @@
         private Task OnGameEnded(GameEnded response)
         {
             _hasGameEnded = true;
-            Logger.Information(response.ToString());
+            if (GameMode == GameMode.Training)
+            {
+                Logger.Information(response.ToString());
+            }
+            else if (GameMode == GameMode.Tournament)
+            {
+                Logger.Information("The game has ended"); // Don't spoil the result in the console.
+            }
             return Task.CompletedTask;
         }
 
@@ -118,7 +133,7 @@
 
         private void SendHearBeat()
         {
-            new HeartBeatSender(_playerId, _client).Run();
+            new HeartBeatSender(_playerId, _paintBotClient).Run();
         }
     }
 }

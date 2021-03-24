@@ -31,7 +31,8 @@ namespace Paintbot.Tests
         [Fact]
         public void CanPerformPlayerAction_ShouldReturnFalse_GivenPlayerNotInGame()
         {
-            var sut = _fixture.Create<MapUtils>();
+            var map = CreateMap(100, 100);
+            var sut = new MapUtils(map);
             var randomAction = _fixture.Create<Action>();
 
             var result = sut.CanPlayerPerformAction("player-not-in-game", randomAction);
@@ -172,7 +173,8 @@ namespace Paintbot.Tests
         [Fact]
         public void GetPlayerColoredPositions_ShouldThrowException_GivenPlayerNotInGame()
         {
-            var sut = _fixture.Create<MapUtils>();
+            var map = CreateMap(100, 100);
+            var sut = new MapUtils(map);
 
             Assert.Throws<Exception>(() => sut.GetPlayerColoredPositions("player-not-in-game"));
         }
@@ -255,7 +257,8 @@ namespace Paintbot.Tests
         [Fact]
         public void GetCoordinateOf_ShouldThrowException_GivenPlayerIsNotInGame()
         {
-            var sut = _fixture.Create<MapUtils>();
+            var map = CreateMap(100, 100);
+            var sut = new MapUtils(map);
 
             Assert.Throws<Exception>(() => sut.GetCoordinateOf("player-not-in-game"));
         }
@@ -275,7 +278,8 @@ namespace Paintbot.Tests
         [Fact]
         public void GetPositionFrom_ShouldThrowArgumentNullException_GivenNullCoordinate()
         {
-            var sut = _fixture.Create<MapUtils>();
+            var map = CreateMap(100, 100);
+            var sut = new MapUtils(map);
 
             Assert.Throws<ArgumentNullException>(() => sut.GetPositionFrom(null));
         }
@@ -283,7 +287,8 @@ namespace Paintbot.Tests
         [Fact]
         public void GetTileAt_ShouldThrowArgumentNullException_GivenNullCoordinate()
         {
-            var sut = _fixture.Create<MapUtils>();
+            var map = CreateMap(100, 100);
+            var sut = new MapUtils(map);
 
             Assert.Throws<ArgumentNullException>(() => sut.GetTileAt(null));
         }
@@ -316,10 +321,10 @@ namespace Paintbot.Tests
             var actualTileAtCharacterPosition = sut.GetTileAt(characterPosition);
             var actualTileAtEmptyPosition = sut.GetTileAt(0);
 
-            Assert.Equal(Tile.OBSTACLE, actualTileAtObstaclePosition);
-            Assert.Equal(Tile.POWERUP, actualTileAtPowerUpPosition);
-            Assert.Equal(Tile.CHARACTER, actualTileAtCharacterPosition);
-            Assert.Equal(Tile.EMPTY, actualTileAtEmptyPosition);
+            Assert.Equal(Tile.Obstacle, actualTileAtObstaclePosition);
+            Assert.Equal(Tile.PowerUp, actualTileAtPowerUpPosition);
+            Assert.Equal(Tile.Character, actualTileAtCharacterPosition);
+            Assert.Equal(Tile.Empty, actualTileAtEmptyPosition);
         }
 
         [Fact]
@@ -393,7 +398,8 @@ namespace Paintbot.Tests
         [Fact]
         public void IsCoordinateOutOfBounds_ShouldThrowArgumentNullException_GivenNullCoordinate()
         {
-            var sut = _fixture.Create<MapUtils>();
+            var map = CreateMap(100, 100);
+            var sut = new MapUtils(map);
 
             Assert.Throws<ArgumentNullException>(() => sut.IsCoordinateOutOfBounds(null));
         }
