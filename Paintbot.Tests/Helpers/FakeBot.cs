@@ -6,14 +6,17 @@
     using PaintBot.Messaging;
     using PaintBot.Messaging.Request.HeartBeat;
     using PaintBot.Messaging.Response;
+    using Serilog;
 
     public class FakeBot : PaintBot
     {
-        public FakeBot(IPaintBotClient paintBotClient, IHearBeatSender heartBeatSender) : base(paintBotClient, heartBeatSender)
+        public FakeBot(IPaintBotClient paintBotClient, IHearBeatSender heartBeatSender, ILogger logger, 
+            GameMode gameMode = GameMode.Training) : base(paintBotClient, heartBeatSender, logger)
         {
+            GameMode = gameMode;
         }
 
-        public override GameMode GameMode => GameMode.Training;
+        public override GameMode GameMode { get; }
         public override string Name => "FakeBot";
 
         public override Action GetAction(MapUpdated mapUpdated)

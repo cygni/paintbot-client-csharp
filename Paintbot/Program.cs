@@ -3,7 +3,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Messaging;
-    using Messaging.Request;
     using Messaging.Request.HeartBeat;
     using Microsoft.Extensions.DependencyInjection;
     using Serilog;
@@ -14,21 +13,23 @@
         {
             var services = ConfigureServices();
             var serviceProvider = services.BuildServiceProvider();
-            ConfigureLogger();
             var myBot = serviceProvider.GetService<MyPaintBot>();
             await myBot.Run(CancellationToken.None);
         }
 
-        private static void ConfigureLogger()
+        private static void ConfigureLogger(IServiceCollection services)
         {
-            Log.Logger = new LoggerConfiguration()
+            var logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .CreateLogger();
+
+            services.AddSingleton<ILogger>(logger);
         }
 
         private static IServiceCollection ConfigureServices()
         {
             IServiceCollection services = new ServiceCollection();
+            ConfigureLogger(services);
             services.AddTransient<MyPaintBot>();
             services.AddTransient<IHearBeatSender, HeartBeatSender>();
             services.AddSingleton<IPaintBotClient, PaintBotClient>();

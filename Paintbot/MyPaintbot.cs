@@ -7,12 +7,13 @@
     using Messaging;
     using Messaging.Request.HeartBeat;
     using Messaging.Response;
+    using Serilog;
 
     public class MyPaintBot : PaintBot
     {
         private IMapUtils _mapUtils;
 
-        public MyPaintBot(IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender) : base(paintBotClient, hearBeatSender)
+        public MyPaintBot(IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender, ILogger logger) : base(paintBotClient, hearBeatSender, logger)
         {
         }
 
