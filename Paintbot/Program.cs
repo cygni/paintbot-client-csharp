@@ -51,7 +51,9 @@
 
             var couldParseGameMode = Enum.TryParse<GameMode>(args.First(), true, out var parsedGameMode);
 
-            return couldParseGameMode ? parsedGameMode : defaultGameMode;
+            return couldParseGameMode
+                ? parsedGameMode
+                : throw new ArgumentException($"Invalid game mode {args.First()}. Should be either Tournament or Training");
         }
     }
 }
