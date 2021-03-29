@@ -66,30 +66,5 @@
 
             return Action.Stay;
         }
-
-        private Action GetDirectionTo(MapCoordinate myPosition, MapCoordinate desired)
-        {
-            if (myPosition.X < desired.X)
-            {
-                return Action.Right;
-            }
-
-            if (myPosition.X > desired.X)
-            {
-                return Action.Left;
-            }
-
-            if (myPosition.Y < desired.Y)
-            {
-                return Action.Down;
-            }
-
-            if (myPosition.Y > desired.Y)
-            {
-                return Action.Up;
-            }
-
-            return Action.Stay;
-        }
     }
 }
