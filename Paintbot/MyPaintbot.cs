@@ -13,11 +13,13 @@
     {
         private IMapUtils _mapUtils;
 
-        public MyPaintBot(IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender, ILogger logger) : base(paintBotClient, hearBeatSender, logger)
+        public MyPaintBot(GameMode gameMode, IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender, ILogger logger) : base(paintBotClient, hearBeatSender, logger)
         {
+            GameMode = gameMode;
         }
 
-        public override GameMode GameMode => GameMode.Training;
+        public override GameMode GameMode { get; }
+
         public override string Name => "My Bot";
 
         public override Action GetAction(MapUpdated mapUpdated)

@@ -1,7 +1,10 @@
 ﻿namespace PaintBot
 {
+    using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Game.Configuration;
     using Messaging;
     using Messaging.Request.HeartBeat;
     using Microsoft.Extensions.DependencyInjection;
@@ -11,9 +14,11 @@
     {
         public static async Task Main(string[] args)
         {
+            var gameMode = GetGameMode(args);
             var services = ConfigureServices();
             var serviceProvider = services.BuildServiceProvider();
-            var myBot = serviceProvider.GetService<MyPaintBot>();
+            var myBot = new MyPaintBot(gameMode, serviceProvider.GetService<IPaintBotClient>(),
+                serviceProvider.GetService<IHearBeatSender>(), serviceProvider.GetService<ILogger>());
             await myBot.Run(CancellationToken.None);
         }
 
@@ -30,11 +35,23 @@
         {
             IServiceCollection services = new ServiceCollection();
             ConfigureLogger(services);
-            services.AddTransient<MyPaintBot>();
             services.AddTransient<IHearBeatSender, HeartBeatSender>();
             services.AddSingleton<IPaintBotClient, PaintBotClient>();
             services.AddSingleton(new PaintBotServerConfig {BaseUrl = "wss://server.paintbot.cygni.se"});
             return services;
+        }
+
+        private static GameMode GetGameMode(string[] args)
+        {
+            const GameMode defaultGameMode = GameMode.Training;
+            if (args == null || !args.Any())
+            {
+                return defaultGameMode;
+            }
+
+            var couldParseGameMode = Enum.TryParse<GameMode>(args.First(), true, out var parsedGameMode);
+
+            return couldParseGameMode ? parsedGameMode : defaultGameMode;
         }
     }
 }
