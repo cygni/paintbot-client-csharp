@@ -24,12 +24,13 @@
 
         public override Action GetAction(MapUpdated mapUpdated)
         {
-            _mapUtils = new MapUtils(mapUpdated.Map);
+            _mapUtils = new MapUtils(mapUpdated.Map); // Keep this
+
+            // Implement your bot here! 
 
             var myCharacter = _mapUtils.GetCharacterInfoFor(mapUpdated.ReceivingPlayerId);
             var myCoordinate = _mapUtils.GetCoordinateFrom(myCharacter.Position);
             var myColouredTiles = _mapUtils.GetCoordinatesFrom(myCharacter.ColouredPositions);
-
 
             if (myCharacter.CarryingPowerUp)
             {
