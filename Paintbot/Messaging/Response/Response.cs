@@ -1,7 +1,5 @@
 namespace PaintBot.Messaging.Response
 {
-    using Extensions;
-
     public abstract class Response
     {
         public string Type { get; set; }
