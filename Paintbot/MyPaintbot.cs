@@ -13,9 +13,9 @@
     {
         private IMapUtils _mapUtils;
 
-        public MyPaintBot(GameMode gameMode, IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender, ILogger logger) : base(paintBotClient, hearBeatSender, logger)
+        public MyPaintBot(PaintBotConfig paintBotConfig, IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender, ILogger logger) : base(paintBotConfig, paintBotClient, hearBeatSender, logger)
         {
-            GameMode = gameMode;
+            GameMode = paintBotConfig.GameMode;
         }
 
         public override GameMode GameMode { get; }

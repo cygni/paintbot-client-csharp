@@ -7,7 +7,7 @@ namespace PaintBot.Messaging.Response
 
         public override string ToString()
         {
-            return base.ToString() + $"Game link : {Url}";
+            return $"Game link : {Url}";
         }
     }
 }

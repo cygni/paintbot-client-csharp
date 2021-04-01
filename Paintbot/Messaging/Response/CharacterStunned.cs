@@ -15,9 +15,8 @@
 
         public override string ToString()
         {
-            return base.ToString() + 
-                $"Player {PlayerId} in game {GameId} stunned for {DurationInTicks} at tick {GameTick} position ({X}, {Y}). \n" +
-                $"Reason: {StunReason}";
+            return $"Player {PlayerId} in game {GameId} stunned for {DurationInTicks} at tick {GameTick} position ({X}, {Y}). \n" +
+                   $"Reason: {StunReason}";
         }
     }
 }

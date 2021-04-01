@@ -11,9 +11,9 @@
     public class FakeBot : PaintBot
     {
         public FakeBot(IPaintBotClient paintBotClient, IHearBeatSender heartBeatSender, ILogger logger, 
-            GameMode gameMode = GameMode.Training) : base(paintBotClient, heartBeatSender, logger)
+            PaintBotConfig config) : base(config, paintBotClient, heartBeatSender, logger)
         {
-            GameMode = gameMode;
+            GameMode = config.GameMode;
         }
 
         public override GameMode GameMode { get; }

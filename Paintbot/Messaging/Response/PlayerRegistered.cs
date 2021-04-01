@@ -11,8 +11,7 @@ namespace PaintBot.Messaging.Response
 
         public override string ToString()
         {
-            return base.ToString() +
-                   $"{Name} registered to game {GameId} for game mode {GameMode}";
+            return $"{Name} registered to game {GameId} for game mode {GameMode}";
         }
     }
 }

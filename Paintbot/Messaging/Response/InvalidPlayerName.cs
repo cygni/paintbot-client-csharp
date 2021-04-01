@@ -13,7 +13,7 @@ namespace PaintBot.Messaging.Response
 
         public override string ToString()
         {
-            return base.ToString() + $"Player name was invalid. Reason: {ReasonCode}";
+            return $"Player name was invalid. Reason: {ReasonCode}";
         }
     }
 }

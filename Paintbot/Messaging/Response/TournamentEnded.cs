@@ -17,9 +17,8 @@
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append(base.ToString());
-            sb.Append(base.ToString());
             sb.Append($"Tournament {TournamentName} ended. Player {GetWinningPlayerName()} won");
+            sb.AppendLine();
             foreach (var result in GameResult)
                 sb.Append($"{result}\n");
 

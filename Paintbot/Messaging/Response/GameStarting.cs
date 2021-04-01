@@ -13,8 +13,7 @@ namespace PaintBot.Messaging.Response
 
         public override string ToString()
         {
-            return base.ToString() +
-                   $"Game {GameId} starting with {NoofPlayers} players";
+            return $"Game {GameId} starting with {NoofPlayers} players";
         }
     }
 }

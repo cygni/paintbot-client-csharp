@@ -8,6 +8,7 @@
     using Helpers;
     using NSubstitute;
     using NSubstitute.ExceptionExtensions;
+    using PaintBot;
     using PaintBot.Game.Configuration;
     using PaintBot.Messaging;
     using PaintBot.Messaging.Request;
@@ -19,10 +20,12 @@
     public class PaintBotTests
     {
         private readonly Fixture _fixture;
+        private readonly PaintBotConfig _config;
 
         public PaintBotTests()
         {
             _fixture = new Fixture();
+            _config = new PaintBotConfig(GameMode.Training, 20);
         }
 
         [Fact]
@@ -32,7 +35,7 @@
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
             client.ConnectAsync(Arg.Any<GameMode>(), Arg.Any<CancellationToken>()).Throws(new Exception());
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
 
             await sut.Run(CancellationToken.None);
 
@@ -46,7 +49,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
 
             await sut.Run(CancellationToken.None);
 
@@ -59,7 +62,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
 
             await sut.Run(CancellationToken.None);
 
@@ -73,7 +76,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var logger = Substitute.For<ILogger>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
 
             await sut.Run(CancellationToken.None);
 
@@ -86,7 +89,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
             var playerRegisteredEvent = _fixture.Create<PlayerRegistered>();
             var events = new List<Response>
             {
@@ -105,7 +108,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
             var playerRegisteredEvent = _fixture.Create<PlayerRegistered>();
             playerRegisteredEvent.ReceivingPlayerId = _fixture.Create<Guid>().ToString();
             var events = new List<Response>
@@ -133,7 +136,7 @@
             };
             client.ReceiveEnumerableAsync<Response>(Arg.Any<CancellationToken>()).Returns(GetTestValues(events));
             var heartBeatSender = Substitute.For<IHearBeatSender>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
 
             await sut.Run(CancellationToken.None);
 
@@ -150,7 +153,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
             var gameLinkEvent = _fixture.Create<GameLink>();
             var events = new List<Response>
             {
@@ -169,7 +172,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
             var gameStartingEvent = _fixture.Create<GameStarting>();
             var events = new List<Response>
             {
@@ -188,7 +191,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
             var events = new List<Response>
             {
                 _fixture.Create<GameResult>()
@@ -206,7 +209,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger, GameMode.Tournament);
+            var sut = new FakeBot(client, heartBeatSender, logger, new PaintBotConfig(GameMode.Tournament, 20));
             var events = new List<Response>
             {
                 _fixture.Create<GameResult>()
@@ -224,7 +227,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
             var characterStunnedEvent = _fixture.Create<CharacterStunned>();
             var events = new List<Response>
             {
@@ -243,7 +246,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
             var heartBeatEvent = _fixture.Create<HeartBeatResponse>();
             var playerRegisteredEvent = _fixture.Create<PlayerRegistered>();
             var events = new List<Response>
@@ -264,7 +267,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger);
+            var sut = new FakeBot(client, heartBeatSender, logger, _config);
             var events = new List<Response>
             {
                 _fixture.Create<GameEnded>()
@@ -282,7 +285,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger, GameMode.Tournament);
+            var sut = new FakeBot(client, heartBeatSender, logger, new PaintBotConfig(GameMode.Tournament, 20));
             var events = new List<Response>
             {
                 _fixture.Create<GameEnded>()
@@ -301,7 +304,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger, GameMode.Tournament);
+            var sut = new FakeBot(client, heartBeatSender, logger, new PaintBotConfig(GameMode.Tournament, 20));
             var events = new List<Response>
             {
                 _fixture.Create<TournamentEnded>()
@@ -320,7 +323,7 @@
             var client = Substitute.For<IPaintBotClient>();
             var heartBeatSender = Substitute.For<IHearBeatSender>();
             var logger = Substitute.For<ILogger>();
-            var sut = new FakeBot(client, heartBeatSender, logger, GameMode.Tournament);
+            var sut = new FakeBot(client, heartBeatSender, logger, new PaintBotConfig(GameMode.Tournament, 20));
             var invalidPlayerEvent = _fixture.Create<InvalidPlayerName>();
             var events = new List<Response>
             {

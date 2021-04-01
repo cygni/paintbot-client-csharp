@@ -14,10 +14,10 @@
     {
         public static async Task Main(string[] args)
         {
-            var gameMode = GetGameMode(args);
+            var config = GetConfig(args);
             var services = ConfigureServices();
             var serviceProvider = services.BuildServiceProvider();
-            var myBot = new MyPaintBot(gameMode, serviceProvider.GetService<IPaintBotClient>(),
+            var myBot = new MyPaintBot(config, serviceProvider.GetService<IPaintBotClient>(),
                 serviceProvider.GetService<IHearBeatSender>(), serviceProvider.GetService<ILogger>());
             await myBot.Run(CancellationToken.None);
         }
@@ -41,19 +41,35 @@
             return services;
         }
 
-        private static GameMode GetGameMode(string[] args)
+        private static PaintBotConfig GetConfig(string[] args)
         {
             const GameMode defaultGameMode = GameMode.Training;
+            const int defaultGameLengthInSeconds = 120;
             if (args == null || !args.Any())
             {
-                return defaultGameMode;
+                return new PaintBotConfig(defaultGameMode, defaultGameLengthInSeconds);
             }
 
             var couldParseGameMode = Enum.TryParse<GameMode>(args.First(), true, out var parsedGameMode);
+            if (!couldParseGameMode)
+            {
+                throw new ArgumentException($"Invalid game mode {args.First()}. Should be either Tournament or Training");
+            }
 
-            return couldParseGameMode
-                ? parsedGameMode
-                : throw new ArgumentException($"Invalid game mode {args.First()}. Should be either Tournament or Training");
+            if (args.Length <= 1)
+            {
+                return new PaintBotConfig(parsedGameMode, defaultGameLengthInSeconds);
+            }
+
+            var couldParseGameLength = int.TryParse(args.ElementAt(1), out var parsedGameLength);
+
+            if (!couldParseGameLength)
+            {
+                throw new ArgumentException($"Invalid game length {args.ElementAt(1)}");
+            }
+
+            return new PaintBotConfig(parsedGameMode, parsedGameLength);
+
         }
     }
 }

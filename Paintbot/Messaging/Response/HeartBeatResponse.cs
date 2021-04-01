@@ -4,7 +4,7 @@
     {
         public override string ToString()
         {
-            return base.ToString() + "Received heartbeat from server";
+            return "Received heartbeat from server";
         }
     }
 }
