@@ -16,11 +16,12 @@
         public MyPaintBot(PaintBotConfig paintBotConfig, IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender, ILogger logger) : base(paintBotConfig, paintBotClient, hearBeatSender, logger)
         {
             GameMode = paintBotConfig.GameMode;
+            Name = paintBotConfig.Name ?? "My c# bot";
         }
 
         public override GameMode GameMode { get; }
 
-        public override string Name => "My Bot";
+        public override string Name { get; }
 
         public override Action GetAction(MapUpdated mapUpdated)
         {

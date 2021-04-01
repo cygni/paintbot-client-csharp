@@ -11,24 +11,22 @@ Welcome to the Paintbot C# Client. This is where you write awesome bots for the 
  - Start writing your bot! 
 ## Running a game
  To get feedback on how your bot is faring you can run a game with it. 
-There are two game modes for PaintBot.  
- - **Training** This lets you play through one game with your bot against random pre-defined bots. This mode is great to use during development, and it's the default mode whenever you run the application. 
- - **Tournament**.  This mode lets you compete with other bots in a tournament. To run in tournament mode, you'll have to add the commandline argument `tournament`.
+### Game modes  
+ - **Training** This lets you play through one game with your bot against random pre-defined bots. This mode is great to use during development.
+ - **Tournament**.  This mode lets you compete with other bots in a tournament.
 
-### Run training mode through commandline
-When using the training mode, you can adjust the game length with a command line argument so that you don't have to sit around and wait for too long. 
+### Command line arguments
+ Paintbot accepts three commandline arguments
+   1. **Bot name** _REQUIRED_
+   2. **Game mode** _OPTIONAL_ Default: Training
+   3. **Game duration in seconds** _OPTIONAL_ Default: 180. Only applicable to training games
+
+Example: `dotnet run SomeBot training 20` would start a 20 second long training game with the bot name SomeBot
+
+### Running from commandline
 1. From the repository root folder, CD into the `Painbot` folder
-2. Run `dotnet run training 20`. 
-This would run a training match which takes 20 seconds. 
+2. Run `dotnet run` followed by the command line arguments of your choice. 
 
-### Run training mode from Visual Studio
+### Run from Visual Studio
 1. Right click the `Paintbot` project and choose `Properties`.
-2. Go to the `Debug` tab. Add `training 20` in the `Application Arguments`text area. 20 can be replaced with the game length of your choice. 
-
-### Run a tournament through commandline
-1. From the repository root folder, CD into the `Painbot` folder
-2. Run `dotnet run tournament`
-
-### Run a tournament from Visual Studio
-1. Right click the `Paintbot` project and choose `Properties`.
-2. Go to the `Debug` tab. Add `tournament` in the `Application Arguments`text area. 
+2. Go to the `Debug` tab. Add the command line arguments in the `Application Arguments`text area.

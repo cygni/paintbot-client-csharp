@@ -43,33 +43,23 @@
 
         private static PaintBotConfig GetConfig(string[] args)
         {
-            const GameMode defaultGameMode = GameMode.Training;
-            const int defaultGameLengthInSeconds = 120;
-            if (args == null || !args.Any())
-            {
-                return new PaintBotConfig(defaultGameMode, defaultGameLengthInSeconds);
-            }
+            var name = args.ElementAtOrDefault(0) ?? throw new Exception("A bot name must be provided");
+            var unparsedGameMode = args.ElementAtOrDefault(1);
+            var unparsedGameLengthInSeconds = args.ElementAtOrDefault(2);
 
-            var couldParseGameMode = Enum.TryParse<GameMode>(args.First(), true, out var parsedGameMode);
+            var couldParseGameMode = Enum.TryParse<GameMode>(unparsedGameMode, out var gameMode);
+            var couldParseGameLength = int.TryParse(unparsedGameLengthInSeconds, out var gameLengthInSeconds);
+
             if (!couldParseGameMode)
             {
-                throw new ArgumentException($"Invalid game mode {args.First()}. Should be either Tournament or Training");
+                gameMode = GameMode.Training;
             }
-
-            if (args.Length <= 1)
-            {
-                return new PaintBotConfig(parsedGameMode, defaultGameLengthInSeconds);
-            }
-
-            var couldParseGameLength = int.TryParse(args.ElementAt(1), out var parsedGameLength);
-
             if (!couldParseGameLength)
             {
-                throw new ArgumentException($"Invalid game length {args.ElementAt(1)}");
+                gameLengthInSeconds = 180;
             }
 
-            return new PaintBotConfig(parsedGameMode, parsedGameLength);
-
+            return new PaintBotConfig(name, gameMode, gameLengthInSeconds);
         }
     }
 }
