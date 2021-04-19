@@ -13,7 +13,7 @@ namespace PaintBot.Game.Configuration
         public int PointsPerCausedStun { get; set; } = 5;
         public int NoOfTicksInvulnerableAfterStun { get; set; } = 3;
         public int NoOfTicksStunned { get; set; } = 10;
-        public int StartObstacles { get; set; } = 5;
+        public int StartObstacles { get; set; } = 30;
         public int StartPowerUps { get; set; } = 1;
         public int GameDurationInSeconds { get; set; } = 180;
         public int ExplosionRange { get; set; } = 4;

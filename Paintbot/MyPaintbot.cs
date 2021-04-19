@@ -1,5 +1,6 @@
 ﻿namespace PaintBot
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Game.Action;
     using Game.Configuration;
@@ -13,7 +14,8 @@
     {
         private IMapUtils _mapUtils;
 
-        public MyPaintBot(PaintBotConfig paintBotConfig, IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender, ILogger logger) : base(paintBotConfig, paintBotClient, hearBeatSender, logger)
+        public MyPaintBot(PaintBotConfig paintBotConfig, IPaintBotClient paintBotClient, IHearBeatSender hearBeatSender, ILogger logger) :
+            base(paintBotConfig, paintBotClient, hearBeatSender, logger)
         {
             GameMode = paintBotConfig.GameMode;
             Name = paintBotConfig.Name ?? "My c# bot";
@@ -27,7 +29,14 @@
         {
             _mapUtils = new MapUtils(mapUpdated.Map); // Keep this
 
-            // Implement your bot here! 
+            // Implement your bot here!
+
+            // The following is a simple example bot. It tries to
+            // 1. Explode PowerUp
+            // 2. Move to a tile that it is not currently owning
+            // 3. Move in the direction where it can move for the longest time. 
+
+            var directions = new List<Action> {Action.Down, Action.Right, Action.Left, Action.Up};
 
             var myCharacter = _mapUtils.GetCharacterInfoFor(mapUpdated.ReceivingPlayerId);
             var myCoordinate = _mapUtils.GetCoordinateFrom(myCharacter.Position);
@@ -38,35 +47,59 @@
                 return Action.Explode;
             }
 
-            var coordinateLeft = myCoordinate.MoveIn(Action.Left);
-            if (!myColouredTiles.Contains(coordinateLeft) &&
-                _mapUtils.CanPlayerPerformAction(myCharacter.Id, Action.Left))
+            var validActionsThatPaintsNotOwnedTile = directions.Where(dir =>
+                !myColouredTiles.Contains(myCoordinate.MoveIn(dir)) && _mapUtils.IsMovementPossibleTo(myCoordinate.MoveIn(dir))).ToList();
+
+            if (validActionsThatPaintsNotOwnedTile.Any())
             {
-                return Action.Left;
+                return validActionsThatPaintsNotOwnedTile.First();
             }
 
-            var coordinateRight = myCoordinate.MoveIn(Action.Right);
-            if (!myColouredTiles.Contains(coordinateRight) &&
-                _mapUtils.CanPlayerPerformAction(myCharacter.Id, Action.Right))
+            var possibleLeftMoves = 0;
+            var possibleRightMoves = 0;
+            var possibleUpMoves = 0;
+            var possibleDownMoves = 0;
+
+            var testCoordinate = _mapUtils.GetCoordinateFrom(myCharacter.Position).MoveIn(Action.Left);
+            while (_mapUtils.IsMovementPossibleTo(testCoordinate))
             {
-                return Action.Right;
+                possibleLeftMoves++;
+                testCoordinate = testCoordinate.MoveIn(Action.Left);
             }
 
-            var coordinateUp = myCoordinate.MoveIn(Action.Up);
-            if (!myColouredTiles.Contains(coordinateUp) &&
-                _mapUtils.CanPlayerPerformAction(myCharacter.Id, Action.Up))
+            testCoordinate = _mapUtils.GetCoordinateFrom(myCharacter.Position).MoveIn(Action.Right);
+            while (_mapUtils.IsMovementPossibleTo(testCoordinate))
             {
-                return Action.Up;
+                possibleRightMoves++;
+                testCoordinate = testCoordinate.MoveIn(Action.Right);
             }
 
-            var coordinateDown = myCoordinate.MoveIn(Action.Down);
-            if (!myColouredTiles.Contains(coordinateDown) &&
-                _mapUtils.CanPlayerPerformAction(myCharacter.Id, Action.Down))
+            testCoordinate = _mapUtils.GetCoordinateFrom(myCharacter.Position).MoveIn(Action.Up);
+            while (_mapUtils.IsMovementPossibleTo(testCoordinate))
             {
-                return Action.Down;
+                possibleUpMoves++;
+                testCoordinate = testCoordinate.MoveIn(Action.Up);
             }
 
-            return Action.Stay;
+            testCoordinate = _mapUtils.GetCoordinateFrom(myCharacter.Position).MoveIn(Action.Down);
+            while (_mapUtils.IsMovementPossibleTo(testCoordinate))
+            {
+                possibleDownMoves++;
+                testCoordinate = testCoordinate.MoveIn(Action.Down);
+            }
+
+            var list = new List<(Action, int)>
+            {
+                (Action.Left, possibleLeftMoves),
+                (Action.Right, possibleRightMoves),
+                (Action.Up, possibleUpMoves),
+                (Action.Down, possibleDownMoves)
+            };
+
+            list.Sort((first, second) => first.Item2.CompareTo(second.Item2));
+            list.Reverse();
+
+            return list.FirstOrDefault(l => l.Item2 > 0).Item1;
         }
     }
 }

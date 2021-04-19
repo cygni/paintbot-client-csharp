@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PaintBot": {
+      "commandName": "Project",
+      "commandLineArgs": "mybot training 60"
+    }
+  }
+}
