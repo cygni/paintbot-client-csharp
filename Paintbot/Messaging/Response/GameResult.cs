@@ -12,7 +12,7 @@ namespace PaintBot.Messaging.Response
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("Game result is in:");
+            sb.AppendLine($"Game result is in for game: {GameId}");
             foreach (var rank in PlayerRanks)
                 sb.Append($"{rank}\n");
 
