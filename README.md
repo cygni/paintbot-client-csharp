@@ -30,3 +30,7 @@ Example: `dotnet run SomeBot training 20` would start a 20 second long training 
 ### Run from Visual Studio
 1. Right click the `Paintbot` project and choose `Properties`.
 2. Go to the `Debug` tab. Add the command line arguments in the `Application Arguments`text area.
+
+## Pitfalls
+Beware the common mishaps:
+- If two bots try to move to the same empty space, they will collide and stun each other. Once the stun ends, they risk doing the same thing again. And again, and again. Don't be the bot who runs into another bot the whole game! (`CanPlayerPerformAction` or `IsMovementPossibleTo` won't help you here, they only check if the tile is currently empty - which it is!)
